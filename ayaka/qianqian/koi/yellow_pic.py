@@ -12,6 +12,7 @@ import os,re,time,socket
 import urllib.request
 import shutil
 from nonebot.rule import to_me,keyword
+import time
 
 #规避检测
 async def defend(bot : Bot, event : Event):
@@ -22,17 +23,22 @@ async def defend(bot : Bot, event : Event):
         bot.config.de_tuling=0
 
 def huyanluanyu():
-    dic=json.load(data.get_resource_path()+'ecy_mad/data.json')
-    dint=ran.randint(0,len(dic))
+    with open(data.get_resource_path()+'ecy_mad/data.json','r',encoding='utf-8') as f:
+        dic=json.load(f)["words"]
+        dint=ran.randint(0,len(dic))
+        f.close()
     return dic[dint]
 
 setu=on_message(keyword('涩图','色图','setu'),priority=5)
 @setu.handle()
 async def picture(event : Event ,bot : Bot ):
-    message=str(event.get_message());c_path=data.get_cache_path()
-    uppercase = data.get_pic_count();print(message)
+    message=str(event.get_message());c_path=data.get_cache_path();uppercase = data.get_pic_count()
+    may_amount_dict = {"一": 1, "1": 1, "二": 2, "2": 2, "两": 2, "三": 3, "3": 3, "四": 4, "4": 4,
+                       "五": 5, "5": 5, "六": 6, "6": 6, "七": 7, "7": 7,
+                       "八": 8, "8": 8, "九": 9, "9": 9, "十": 10, "10": 10}
+    loop=1 #需要的色图份数
     if 'id' in message:
-        message.replace('=','')
+        message=message.replace('=','')
         try:
             index=re.findall('id(\d+)',message)[0]
             if int(index)>int(data.get_pic_count()):
@@ -41,65 +47,85 @@ async def picture(event : Event ,bot : Bot ):
             pici.pass_pic(int(index))
             await bot.send(message=Message('[CQ:image,file=file:///'+c_path+'image_up/%s.jpg]'%index+'数据库索引：{}/{}'.format(index, uppercase)),event=event)
             pici.pass_over(int(index))
+            return True
         except:
             await bot.send(message='id读取出错啦，七海试试其它方法吧',event=event)
-        finally:
-            pass
-    if '涩图' in message:
+    if '涩图' in message or '色图' in message:
+        raw_message = message
         try:
-            message=str(re.findall('张(\S+?)涩图',message)[0])
+            (may_amount,message)=re.findall('(\S?)[张,份](\S+?)[涩,色]图',message)[0]
+            if may_amount in may_amount_dict.keys():
+                try:
+                    may_amount2 = re.findall('(\d+?)[张,份]', raw_message)[0]
+                    loop = int(may_amount2)
+                except:
+                    loop=may_amount_dict[may_amount]
         except:
-            message=message.split('涩图')[0]
-    if '色图' in message:
-        try:
-            message=re.findall('张(\S+?)色图',message)[0]
-        except:
-            message = message.split('色图')[0]
-
-    if message!='':
-        hoxina=tag_m.tag_act()
-        pic_feedback=hoxina.get_tag_pic(message)
-        if pic_feedback == 0:
-            await bot.send(message='七海不记得有标签"{}",正在努力寻找哦'.format(message),event=event)
-            respond= await pix.pix_search_from_tag(bot=bot,tag=message)
-            if respond[0]==False:
-                await bot.send(message='七海没有在pixiv上找到对应的图片诶，给你一张其它的吧',event=event)
-                await random_pic(event,bot)
+            try:
+                may_amount=re.findall('(\S?)[张,份]',message)[0]
+                if may_amount in may_amount_dict.keys():
+                    try:
+                        may_amount2 = re.findall('(\d+?)[张,份]', raw_message)[0]
+                        loop = int(may_amount2)
+                        message=message.replace(may_amount2,'');message=message.replace('张','');message=message.replace('份','')
+                    except:
+                        loop=may_amount_dict[may_amount]
+                        message=message.replace(may_amount,'');message=message.replace('张','');message=message.replace('份','')
+            except:
+                pass
+            finally:
+                try:
+                    message=message.split('涩图')[0]
+                except:
+                    message=message.split('色图')[0]
+    while loop>0:
+        loop-=1
+        if message!='':
+            hoxina=tag_m.tag_act()
+            pic_feedback=hoxina.get_tag_pic(message)
+            if pic_feedback == 0:
+                respond= await pix.pix_search_from_tag(bot=bot,tag=message)
+                if respond[0]==False:
+                    await random_pic(event,bot,additional=1)
+                else:
+                    await bot.send(message=Message('[CQ:image,file=file:///'+respond[1]+']'+f'\npixid={respond[2]}\n--来自pixiv'),event=event)
+                    os.remove(respond[1])
+            elif pic_feedback == 1:
+                respond = await pix.pix_search_from_tag(bot=bot, tag=message)
+                if respond[0] == False:
+                    await random_pic(event, bot,additional=1)
+                else:
+                    await bot.send(message=Message('[CQ:image,file=file:///' + respond[1] + ']' + f'\npixid={respond[2]}\n--来自pixiv'),event=event)
+                    os.remove(respond[1])
+            elif pic_feedback == 2:
+                await bot.send(message="关键字错误",event=event)
+                pass
             else:
-                await bot.send(message=Message('[CQ:image,file=file:///'+respond[1]+']'+f'\npixid={respond[2]}\n--来自pixiv'),event=event)
-                os.remove(respond[1])
-        elif pic_feedback == 1:
-            await bot.send(message='没有符合全部tag的图片哦,七海会试着找一找的',event=event)
-            respond = await pix.pix_search_from_tag(bot=bot, tag=message)
-            if respond[0] == False:
-                await bot.send(message='七海没有在pixiv上找到对应的图片诶，给你一张其它的吧',event=event)
-                await random_pic(event, bot)
-            else:
-                await bot.send(message=Message('[CQ:image,file=file:///' + respond[1] + ']' + f'\npixid={respond[2]}\n--来自pixiv'),event=event)
-                os.remove(respond[1])
-        elif pic_feedback == 2:
-            #没有关键词错误
-            pass
+                id = ran.choice(pic_feedback)
+                pici.pass_pic(id)
+                await bot.send(message=Message(
+                    '[CQ:image,file=file:///' + c_path + 'image_up/%s.jpg]' % id + '数据库索引：{}/{}'.format(id, uppercase)),
+                               event=event)
+                pici.pass_over(id)
         else:
-            id=ran.choice(pic_feedback)
-            pici.pass_pic(id)
-            await bot.send(message=Message('[CQ:image,file=file:///'+c_path+'image_up/%s.jpg]'%id+'数据库索引：{}/{}'.format(id, uppercase)),event=event)
-            pici.pass_over(id)
-    else:
-        await random_pic(event,bot)
-    await defend(bot,event)
+            await random_pic(event,bot)
+        await defend(bot, event)
 
 
-async def random_pic(event :Event,bot :Bot):
+async def random_pic(event :Event,bot :Bot,additional=0):
     uppercase = data.get_pic_count();c_path=data.get_cache_path()
     random = ran.randint(1, uppercase)
     pici.pass_pic(random)
     tagact = tag_m.tag_act()
     tag = tagact.get_pic_tag("id={}".format(random))
-    print(event)
-    await bot.send(
-        message=Message('[CQ:image,file=file:///'+c_path+'image_up/{}.jpg]'.format(random) +
+    if additional==1:
+        await bot.send(
+            message=Message('七海没有在pixiv上找到对应的图片诶，给你一张其它的吧\n[CQ:image,file=file:///'+c_path+'image_up/{}.jpg]'.format(random) +
                         '\n数据库索引：{}/{}\n标签为：{}'.format(random, uppercase, tag)), event=event)
+    else:
+        await bot.send(
+            message=Message('[CQ:image,file=file:///' + c_path + 'image_up/{}.jpg]'.format(random) +
+                            '\n数据库索引：{}/{}\n标签为：{}'.format(random, uppercase, tag)), event=event)
     pici.pass_over(random)
 
 

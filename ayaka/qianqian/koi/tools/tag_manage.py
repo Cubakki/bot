@@ -38,7 +38,7 @@ class tag_act():
             return "无对应标签"
         return self.p2t[id]
 
-# 返回某几个tag下对应的所有图片id，返回的数据类型是list,输入为字符串，格式为"[tag]"，使用正则表达式分离
+# 返回某几个tag下对应的所有图片id，返回的数据类型是list,输入为字符串，格式为"{tag}"使用正则表达式分离
     def get_tag_pic(self,string):
         tag=re.findall('\{(\S+?)\}',string)
         if len(tag)==0:
