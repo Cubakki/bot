@@ -52,8 +52,8 @@ async def yushenqian(event : MessageEvent,bot : Bot):
                '--{}--\n' \
                '{}\n' \
                '另外，香火布施就不必了，若是有心，不如留下些甜点心吧~'.format(send_title,send_name,qianwen[num][0],qianwen[num][1])
-    msg=MessageSegment.text(origin_msg)
-    await bot.send(message=msg,event=event)
+    #msg=MessageSegment.text(origin_msg)
+    await bot.send(message=origin_msg,event=event)
     new_log={'nickname': nickname,'sex':sex,'card':card,'title':title,'origin_msg': origin_msg,
              'whole_time': nowtime+' '+direct_time,'result':qianwen[num][1]}
     log[nowtime][id].update(new_log)

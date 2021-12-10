@@ -1,6 +1,6 @@
 from koi.tools import tag_manage,init_data,pic_init
 from nonebot import on_command
-from nonebot.adapters import Event,Bot,Message
+from nonebot_adapter_gocq import Event,Bot,Message
 from nonebot.rule import to_me
 import re
 
@@ -89,3 +89,15 @@ async def add_tag(bot: Bot,event : Event):
         await bot.send(message='这个tag已经存在了哦',event=event)
     else:
         await bot.send(message='tag添加成功，图片现有的tag为:{}'.format(','.join(hoxina.get_pic_tag(message))),event=event)
+
+tag_represent=on_command('遍历标签',to_me())
+@tag_represent.handle()
+async def tag_represent(bot : Bot,event : Event):
+    message = str(event.get_message())
+    hoxina = tag_manage.tag_act()
+    c_path=init_data.get_cache_path()
+    pic_feedback = hoxina.get_tag_pic(message)
+    for id in pic_feedback:
+        pic_init.pass_pic(id)
+        await bot.send(message=Message('[CQ:image,file=file:///' + c_path + 'image_up/%s.jpg]' % id),event=event)
+        pic_init.pass_over(id)
