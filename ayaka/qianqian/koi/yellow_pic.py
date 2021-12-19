@@ -76,8 +76,9 @@ async def picture(event : Event ,bot : Bot ):
             finally:
                 try:
                     message=message.split('涩图')[0]
-                except:
                     message=message.split('色图')[0]
+                except:
+                    pass
     while loop>0:
         loop-=1
         if message!='':
