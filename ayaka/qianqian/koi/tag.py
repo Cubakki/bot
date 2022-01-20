@@ -84,8 +84,8 @@ addtag2=on_command('addtag',to_me())
 async def add_tag(bot: Bot,event : Event):
     message=str(event.get_message())
     hoxina=tag_manage.tag_act()
-    a=hoxina.add_tag(message)
-    if a==0:
+    result=hoxina.add_tag(message)
+    if result==0:
         await bot.send(message='这个tag已经存在了哦',event=event)
     else:
         await bot.send(message='tag添加成功，图片现有的tag为:{}'.format(','.join(hoxina.get_pic_tag(message))),event=event)

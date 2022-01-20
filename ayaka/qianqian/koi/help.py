@@ -18,7 +18,7 @@ async def help(bot :Bot ,event : Event):
     if key==[]:
         text='七海是我可爱的妹妹！\n\n目前的模块有：\n' \
             '-lottery(抽卡)\n-schedu(定时任务，非交互模块)\n-control(功能控制模块)\n-tag(图库标签检索)\n-tuling(聊天功能接口)\n' \
-            '-various_small_func(一些小功能）\n-voice（语音交互模块）\n-pic(图库模块)\n-ghz（公会战,开发中）\n\n' \
+            '-various_small_func(一些小功能）\n-voice（语音交互模块）\n-pic(图库模块)\n-luck(运势签等)' \
             '具体说明请以\'-help (功能)\'的形式获取\n' \
             '示例： -help lottery\n\n' \
             'tips：所有与七海的交互分为两部分，即唤醒词与命令语句。命令语句可以在说明中查阅，唤醒词包括： \
@@ -85,6 +85,8 @@ async def help(bot :Bot ,event : Event):
         text='搜图模块可以将图片上传至识图网站并返回结果\n' \
              '使用\'-搜图\'命令即可创建一个搜图会话事件，请依据指引步骤答复相应内容\n' \
              '请注意所有答复都需要以\'-\'开头或@七海，否则内容将不会被识别'
+    elif key[0]=="luck":
+        text="运势模块现在包括御神签与塔罗牌，命令分别为‘-今日运势’与‘塔罗’"
     else:
         text='还没有学到这个功能啦'
     await bot.send(message=Message(text),event=event)

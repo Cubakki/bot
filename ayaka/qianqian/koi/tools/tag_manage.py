@@ -90,7 +90,7 @@ class tag_act():
             f.write(data)
             f.close()
 
-#向图片添加指定tag，输入一串字符（指令内容），正则表达式判断格式为“ id=xxx”和“[tag] ”,其中[tag]可以有多个,正则表达式会识别两个输入项"id"和"tag"
+#向图片添加指定tag，输入一串字符（指令内容），正则表达式判断格式为“ id=xxx”和“{tag} ”,其中id和tag都可以有多个,正则表达式会识别两个输入项"id"和"tag"
     def add_tag(self,string):
         id=re.findall('id=(\d+)',string)
         tag=re.findall('\{(\S+?)\}',string)
