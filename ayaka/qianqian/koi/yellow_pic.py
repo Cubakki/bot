@@ -121,6 +121,10 @@ async def random_pic(event :Event,bot :Bot,additional=0):
         await bot.send(
             message=Message('七海没有在pixiv上找到对应的图片诶，给你一张其它的吧\n[CQ:image,file=file:///'+c_path+'image_up/{}.jpg]'.format(random) +
                         '\n数据库索引：{}/{}\n标签为：{}'.format(random, uppercase, tag)), event=event)
+    elif additional==2:
+        await bot.send(
+            message=Message('本地没有这个词条哦。七海给你一张其他的吧\n[CQ:image,file=file:///'+c_path+'image_up/{}.jpg]'.format(random) +
+                        '\n数据库索引：{}/{}\n标签为：{}'.format(random, uppercase, tag)), event=event)
     else:
         await bot.send(
             message=Message('[CQ:image,file=file:///' + c_path + 'image_up/{}.jpg]'.format(random) +
