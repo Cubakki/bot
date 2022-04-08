@@ -32,5 +32,12 @@ async def glob_set2(bot : Bot,event : MessageEvent,state : T_State):
                     await bot.send(message="请告诉七海正确的设定值哦",event=event)
             except:
                 await bot.send(message="指令不正确",event=event)
+        elif "pixiv" in body:
+            if bot.config.pixiv == 1:
+                bot.config.pixiv = 0
+                await bot.send(message=f"pixiv自动搜索已禁用", event=event)
+            elif bot.config.pixiv == 0:
+                bot.config.pixiv = 1
+                await bot.send(message=f"pixiv自动搜索已启用", event=event)
     else:
         await bot.send(message="乃不是七海的饲主哦，不能更改全局设置",event=event)

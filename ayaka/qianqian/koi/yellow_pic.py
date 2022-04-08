@@ -84,20 +84,18 @@ async def picture(event : Event ,bot : Bot ):
         if message!='':
             hoxina=tag_m.tag_act()
             pic_feedback=hoxina.get_tag_pic(message)
-            if pic_feedback == 0:
-                respond= await pix.pix_search_from_tag(bot=bot,tag=message)
-                if respond[0]==False:
-                    await random_pic(event,bot,additional=1)
+            if pic_feedback in [0,1] :
+                if bot.config.pixiv == 1:
+                    respond = await pix.pix_search_from_tag(bot=bot, tag=message)
+                    if respond[0] == False:
+                        await random_pic(event, bot, additional=1)
+                    else:
+                        await bot.send(message=Message(
+                            '[CQ:image,file=file:///' + respond[1] + ']' + f'\npixid={respond[2]}\n--来自pixiv'),
+                                       event=event)
+                        os.remove(respond[1])
                 else:
-                    await bot.send(message=Message('[CQ:image,file=file:///'+respond[1]+']'+f'\npixid={respond[2]}\n--来自pixiv'),event=event)
-                    os.remove(respond[1])
-            elif pic_feedback == 1:
-                respond = await pix.pix_search_from_tag(bot=bot, tag=message)
-                if respond[0] == False:
-                    await random_pic(event, bot,additional=1)
-                else:
-                    await bot.send(message=Message('[CQ:image,file=file:///' + respond[1] + ']' + f'\npixid={respond[2]}\n--来自pixiv'),event=event)
-                    os.remove(respond[1])
+                    await random_pic(event,bot)
             elif pic_feedback == 2:
                 await bot.send(message="关键字错误",event=event)
                 pass
